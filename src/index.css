@@ -1,4 +1,10 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+  font-family: 'Neuton ExtraBold';
+  src: url('../public/fonts/Neuton-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}

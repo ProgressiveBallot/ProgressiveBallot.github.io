@@ -66,10 +66,10 @@ const App = () => {
         },
         {
           id: '5',
-          name: 'Amy Klobuchar',
-          state: 'MN',
+          name: 'Catherine Cortez Masto',
+          state: 'NV',
           type: 'negative',
-          details: 'Supported legislation weakening antitrust enforcement against big tech companies.'
+          details: 'Voted to increase ACA healthcare premiums for millions of Americans.'
         },
         {
           id: '6',
@@ -84,6 +84,48 @@ const App = () => {
           state: 'RI',
           type: 'positive',
           details: 'Leading advocate for climate change action and corporate accountability.'
+        },
+        {
+          id: '8',
+          name: 'Richard J. Durbin',
+          state: 'IL',
+          type: 'negative',
+          details: 'Voted to increase ACA healthcare premiums for millions of Americans.'
+        },
+        {
+          id: '9',
+          name: 'Maggie Hassan',
+          state: 'NH',
+          type: 'negative',
+          details: 'Voted to increase ACA healthcare premiums for millions of Americans.'
+        },
+        {
+          id: '10',
+          name: 'Tim Kaine',
+          state: 'VA',
+          type: 'negative',
+          details: 'Voted to increase ACA healthcare premiums for millions of Americans.'
+        },
+        {
+          id: '11',
+          name: 'Angus King',
+          state: 'ME',
+          type: 'negative',
+          details: 'Voted to increase ACA healthcare premiums for millions of Americans.'
+        },
+        {
+          id: '12',
+          name: 'Jacky Rosen',
+          state: 'NV',
+          type: 'negative',
+          details: 'Voted to increase ACA healthcare premiums for millions of Americans.'
+        },
+        {
+          id: '13',
+          name: 'Jeanne Shaheen',
+          state: 'NH',
+          type: 'negative',
+          details: 'Voted to increase ACA healthcare premiums for millions of Americans.'
         }
       ];
       
@@ -147,6 +189,7 @@ const App = () => {
       state,
       role,
       party: info?.party?.trim() || '',
+      recommended: info?.recommended?.trim() || '',
       legInfo: info
     };
   };
@@ -353,17 +396,26 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 md:p-6">
+    <div className="mt-4 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 
+          <a 
             onClick={resetToHome}
-            className="text-4xl md:text-6xl font-black text-indigo-900 mb-3 cursor-pointer hover:opacity-80 transition-opacity tracking-tight"
+            className="font-neuton text-indigo-900 mb-3 cursor-pointer hover:opacity-80 transition-opacity tracking-tight"
           >
-            THE PROGRESSIVE BALLOT
-          </h1>
-          <p className="text-gray-600 text-base md:text-lg">Track congressional votes and hold representatives accountable</p>
+            <span
+            className="text-4xl md:text-5xl"
+            >
+              The<br></br>
+            </span>
+            <h1 
+            className="-mt-5 text-5xl md:text-7xl inline-block pb-5 border-b-2 border-gray-300"
+            >
+              Progressive Ballot
+            </h1>
+          </a>
+          <p className="text-gray-600 mt-4 text-2xl md:text-xl">See who fights for progress — and who impedes it.</p>
         </div>
 
         {/* Search Section */}
@@ -477,11 +529,11 @@ const App = () => {
             <div className="mb-8">
               <div className="flex items-start gap-3 mb-3">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{selectedPolitician.name}</h2>
-                {selectedPolitician.recommended === true && (
-                  <span className="text-3xl leading-none" title="Recommended">🟢</span>
+                {selectedPolitician.recommended == "yes" && (
+                  <span className="text-3xl leading-none" title="Recommended">👑</span>
                 )}
-                {selectedPolitician.recommended === false && (
-                  <span className="text-3xl leading-none" title="Not Recommended">🔴</span>
+                {selectedPolitician.recommended == "no" && (
+                  <span className="text-3xl leading-none" title="Not Recommended">💩</span>
                 )}
               </div>
               <p className="text-xl text-gray-600 mb-4">
@@ -580,7 +632,7 @@ const App = () => {
           <div className="grid lg:grid-cols-2 gap-6">
             {/* Positive Featured */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-green-700 mb-6 flex items-center gap-3">
+              <h3 className="text-2xl md:text-3xl font-bold text-green-800 mb-6 flex items-center gap-3">
                 <ThumbsUp size={32} />
                 Progressive Champions
               </h3>
@@ -593,11 +645,11 @@ const App = () => {
                   >
                     <div className="flex items-start gap-2 mb-2">
                       <h4 className="font-bold text-lg text-gray-900 flex-1">{pol.name}</h4>
-                      {pol.recommended === true && (
-                        <span className="text-2xl leading-none" title="Recommended">🟢</span>
+                      {pol.recommended == "yes" && (
+                        <span className="text-2xl leading-none" title="Recommended">👑</span>
                       )}
-                      {pol.recommended === false && (
-                        <span className="text-2xl leading-none" title="Not Recommended">🔴</span>
+                      {pol.recommended == "no" && (
+                        <span className="text-2xl leading-none" title="Not Recommended">💩</span>
                       )}
                     </div>
                     <p className="text-sm text-gray-600 mb-3">
@@ -614,9 +666,9 @@ const App = () => {
 
             {/* Negative Featured */}
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-red-700 mb-6 flex items-center gap-3">
-                <ThumbsDown size={32} />
-                Accountability Watch
+              <h3 className="text-2xl md:text-3xl font-bold text-red-800 mb-6 flex items-center gap-3">
+                <span className="mt-1"><ThumbsDown size={32} /></span>
+                Regressive Offenders
               </h3>
               <div className="space-y-4">
                 {featuredNegative.map((pol, idx) => (
@@ -627,11 +679,11 @@ const App = () => {
                   >
                     <div className="flex items-start gap-2 mb-2">
                       <h4 className="font-bold text-lg text-gray-900 flex-1">{pol.name}</h4>
-                      {pol.recommended === true && (
-                        <span className="text-2xl leading-none" title="Recommended">🟢</span>
+                      {pol.recommended == "yes" && (
+                        <span className="text-2xl leading-none" title="Recommended">👑</span>
                       )}
-                      {pol.recommended === false && (
-                        <span className="text-2xl leading-none" title="Not Recommended">🔴</span>
+                      {pol.recommended == "no" && (
+                        <span className="text-2xl leading-none" title="Not Recommended">💩</span>
                       )}
                     </div>
                     <p className="text-sm text-gray-600 mb-3">
