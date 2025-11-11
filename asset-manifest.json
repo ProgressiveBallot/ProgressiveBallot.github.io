@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/ProgressiveBallot.github.io/static/css/main.487ec3e6.css",
-    "main.js": "/ProgressiveBallot.github.io/static/js/main.532ae225.js",
-    "static/js/453.66f0ee52.chunk.js": "/ProgressiveBallot.github.io/static/js/453.66f0ee52.chunk.js",
-    "index.html": "/ProgressiveBallot.github.io/index.html",
-    "main.487ec3e6.css.map": "/ProgressiveBallot.github.io/static/css/main.487ec3e6.css.map",
-    "main.532ae225.js.map": "/ProgressiveBallot.github.io/static/js/main.532ae225.js.map",
-    "453.66f0ee52.chunk.js.map": "/ProgressiveBallot.github.io/static/js/453.66f0ee52.chunk.js.map"
+    "main.css": "/static/css/main.487ec3e6.css",
+    "main.js": "/static/js/main.da5ded54.js",
+    "static/js/453.66f0ee52.chunk.js": "/static/js/453.66f0ee52.chunk.js",
+    "index.html": "/index.html",
+    "main.487ec3e6.css.map": "/static/css/main.487ec3e6.css.map",
+    "main.da5ded54.js.map": "/static/js/main.da5ded54.js.map",
+    "453.66f0ee52.chunk.js.map": "/static/js/453.66f0ee52.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.487ec3e6.css",
-    "static/js/main.532ae225.js"
+    "static/js/main.da5ded54.js"
   ]
 }
