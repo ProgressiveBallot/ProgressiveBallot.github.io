@@ -410,12 +410,12 @@ const App = () => {
               The<br></br>
             </span>
             <h1 
-            className="-mt-5 text-5xl md:text-7xl inline-block pb-5 border-b-2 border-gray-300"
+            className="-mt-3 md:-mt-5 text-5xl md:text-7xl inline-block pb-5 border-b-2 border-gray-300"
             >
               Progressive Ballot
             </h1>
           </a>
-          <p className="text-gray-600 mt-4 text-2xl md:text-xl">See who fights for progress — and who impedes it.</p>
+          <p className="text-gray-600 mt-4 text-lg md:text-xl">See who fights for progress — and who impedes it.</p>
         </div>
 
         {/* Search Section */}
