@@ -634,7 +634,7 @@ const App = () => {
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8">
               <h3 className="text-2xl md:text-3xl font-bold text-green-800 mb-6 flex items-center gap-3">
                 <ThumbsUp size={32} />
-                Progressive Champions
+                Progressive Leaders
               </h3>
               <div className="space-y-4">
                 {featuredPositive.map((pol, idx) => (
