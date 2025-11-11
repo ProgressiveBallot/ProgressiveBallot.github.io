@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/static/css/main.e93c5fbf.css",
-    "main.js": "/static/js/main.577ce3ee.js",
+    "main.css": "/static/css/main.41de6655.css",
+    "main.js": "/static/js/main.218b6b71.js",
     "static/js/453.66f0ee52.chunk.js": "/static/js/453.66f0ee52.chunk.js",
     "static/media/Neuton-ExtraBold.ttf": "/static/media/Neuton-ExtraBold.b775f7c5e6572b021333.ttf",
     "index.html": "/index.html",
-    "main.e93c5fbf.css.map": "/static/css/main.e93c5fbf.css.map",
-    "main.577ce3ee.js.map": "/static/js/main.577ce3ee.js.map",
+    "main.41de6655.css.map": "/static/css/main.41de6655.css.map",
+    "main.218b6b71.js.map": "/static/js/main.218b6b71.js.map",
     "453.66f0ee52.chunk.js.map": "/static/js/453.66f0ee52.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e93c5fbf.css",
-    "static/js/main.577ce3ee.js"
+    "static/css/main.41de6655.css",
+    "static/js/main.218b6b71.js"
   ]
 }
