@@ -399,7 +399,7 @@ const App = () => {
     <div className="mt-4 min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-7 md:mb-10">
           <a 
             onClick={resetToHome}
             className="font-neuton text-indigo-900 mb-3 cursor-pointer hover:opacity-80 transition-opacity tracking-tight"
@@ -415,7 +415,7 @@ const App = () => {
               Progressive Ballot
             </h1>
           </a>
-          <p className="text-gray-600 mt-4 text-lg md:text-xl">See who fights for progress — and who impedes it.</p>
+          <p className="text-gray-600 mt-4 text-sm md:text-xl">See who fights for progress — and who impedes it.</p>
         </div>
 
         {/* Search Section */}
