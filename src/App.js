@@ -459,7 +459,7 @@ const App = () => {
                   setSearchValue(val);
                 }
               }}
-              placeholder={searchType === 'zip' ? 'Enter ZIP code (e.g., 02830)' : 'Enter politician name'}
+              placeholder={searchType === 'zip' ? 'Enter 5-digit ZIP code' : 'Enter politician name'}
               className="flex-1 px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
               onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
             />
