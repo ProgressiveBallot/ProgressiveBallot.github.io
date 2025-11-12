@@ -126,6 +126,20 @@ const App = () => {
           state: 'NH',
           type: 'negative',
           details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.'
+        },
+        {
+          id: '14',
+          name: 'Ron Wyden',
+          state: 'OR',
+          type: 'negative',
+          details: 'Voted against all recent measures to block arms sales to Israel, fully aware that these weapons would be used to commit acts of genocide, siding with Republicans.'
+        },
+        {
+          id: '15',
+          name: 'Ron Wyden',
+          state: 'OR',
+          type: 'negative',
+          details: 'Endorsed by and funded by AIPAC, an organization that opposes efforts to hold the Israeli government accountable for acts of genocide committed against Palestinians.'
         }
       ];
       
