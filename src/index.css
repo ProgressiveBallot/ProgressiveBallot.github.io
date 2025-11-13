@@ -8,3 +8,9 @@
   font-weight: 800;
   font-style: normal;
 }
+
+
+body {
+  background: linear-gradient(to bottom right, #fce3f1, #f0e0ff, #e0eeff);
+  background-attachment: fixed;
+}

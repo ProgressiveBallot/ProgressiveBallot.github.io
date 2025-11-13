@@ -2,15 +2,71 @@ import React, { useState, useEffect } from 'react';
 import { Search, ThumbsUp, ThumbsDown, MapPin, User, ExternalLink, Phone, Mail, MapPinned, Calendar } from 'lucide-react';
 import Papa from 'papaparse';
 
+const generateBioGuideUrl = (legInfo) => {
+
+    if (!legInfo || !legInfo.bioguide_id) return null;
+
+    return `https://bioguide.congress.gov/search/bio/${legInfo.bioguide_id}`;
+
+  };
+
+
+
+  const formatAddress = (address) => {
+
+    if (!address) return '';
+
+    // Add commas before building names and DC/state
+
+    return address
+
+      .replace(/(\d+)\s+([A-Z])/g, '$1, $2') // Add comma after street number
+
+      .replace(/Building\s+([A-Z])/g, 'Building, $1') // Add comma after Building
+
+      .replace(/DC\s+(\d)/g, 'DC, $1'); // Add comma after DC
+
+  };
+
+
+
+  const generateOpenSecretsUrl = (legInfo) => {
+
+    if (!legInfo || !legInfo.opensecrets_id) return null;
+
+    
+
+    const firstName = (legInfo.nickname || legInfo.first_name || '').toLowerCase().trim();
+
+    const lastName = (legInfo.last_name || '').toLowerCase().trim();
+
+    
+
+    if (!firstName || !lastName) return null;
+
+    
+
+    const nameSlug = `${firstName}-${lastName}`;
+
+    return `https://www.opensecrets.org/personal-finances/${nameSlug}/net-worth?cid=${legInfo.opensecrets_id}`;
+
+  };
+
 const App = () => {
   const [searchType, setSearchType] = useState('zip');
   const [searchValue, setSearchValue] = useState('');
   const [results, setResults] = useState(null);
   const [selectedPolitician, setSelectedPolitician] = useState(null);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [previousView, setPreviousView] = useState(null);
   const [error, setError] = useState('');
   const [records, setRecords] = useState([]);
+  const [recordSearchValue, setRecordSearchValue] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [legislatorData, setLegislatorData] = useState([]);
+  const [submitPoliticians, setSubmitPoliticians] = useState('');
+  const [submitRecord, setSubmitRecord] = useState('');
+  const [submitStatus, setSubmitStatus] = useState('');
 
   const loadData = async () => {
     await loadRecords();
@@ -32,127 +88,88 @@ const App = () => {
     }
   };
 
+
+
   const loadRecords = async () => {
-    try {
-      // Force refresh by clearing old data and setting new data
-      const initialRecords = [
-        {
-          id: '1',
-          name: 'John Fetterman',
-          state: 'PA',
-          type: 'negative',
-          details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.'
-        },
-        {
-          id: '2',
-          name: 'Bernard Sanders',
-          state: 'VT',
-          type: 'positive',
-          details: 'Consistently fought for Medicare for All and expanded healthcare access.'
-        },
-        {
-          id: '3',
-          name: 'Bernard Sanders',
-          state: 'VT',
-          type: 'positive',
-          details: 'Authored legislation to raise minimum wage to $15 per hour.'
-        },
-        {
-          id: '4',
-          name: 'Maria Cantwell',
-          state: 'WA',
-          type: 'positive',
-          details: 'Strong advocate for clean energy and environmental protection legislation.'
-        },
-        {
-          id: '5',
-          name: 'Catherine Cortez Masto',
-          state: 'NV',
-          type: 'negative',
-          details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.'
-        },
-        {
-          id: '6',
-          name: 'Amy Klobuchar',
-          state: 'MN',
-          type: 'positive',
-          details: 'Led bipartisan efforts to lower prescription drug costs.'
-        },
-        {
-          id: '7',
-          name: 'Sheldon Whitehouse',
-          state: 'RI',
-          type: 'positive',
-          details: 'Leading advocate for climate change action and corporate accountability.'
-        },
-        {
-          id: '8',
-          name: 'Richard J. Durbin',
-          state: 'IL',
-          type: 'negative',
-          details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.'
-        },
-        {
-          id: '9',
-          name: 'Maggie Hassan',
-          state: 'NH',
-          type: 'negative',
-          details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.'
-        },
-        {
-          id: '10',
-          name: 'Tim Kaine',
-          state: 'VA',
-          type: 'negative',
-          details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.'
-        },
-        {
-          id: '11',
-          name: 'Angus King',
-          state: 'ME',
-          type: 'negative',
-          details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.'
-        },
-        {
-          id: '12',
-          name: 'Jacky Rosen',
-          state: 'NV',
-          type: 'negative',
-          details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.'
-        },
-        {
-          id: '13',
-          name: 'Jeanne Shaheen',
-          state: 'NH',
-          type: 'negative',
-          details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.'
-        },
-        {
-          id: '14',
-          name: 'Ron Wyden',
-          state: 'OR',
-          type: 'negative',
-          details: 'Voted against all recent measures to block arms sales to Israel, fully aware that these weapons would be used to commit acts of genocide, siding with Republicans.'
-        },
-        {
-          id: '15',
-          name: 'Ron Wyden',
-          state: 'OR',
-          type: 'negative',
-          details: 'Endorsed by and funded by AIPAC, an organization that opposes efforts to hold the Israeli government accountable for acts of genocide committed against Palestinians.'
-        }
-      ];
-      
-      setRecords(initialRecords);
-      
-      try {
-        await window.storage.set('politician-records', JSON.stringify(initialRecords));
-      } catch (setError) {
-        console.error('Error saving records:', setError);
+    const initialRecords = [
+      {
+        id: '1',
+        type: 'negative',
+        details: 'Voted to increase ACA healthcare premiums for millions of Americans.',
+        politicians: ['John Fetterman'],
+        timestamp: Date.now() - 86400000
+      },
+      {
+        id: '2',
+        type: 'positive',
+        details: 'Consistently fought for Medicare for All and expanded healthcare access.',
+        politicians: ['Bernard Sanders'],
+        timestamp: Date.now() - 172800000
+      },
+      {
+        id: '3',
+        type: 'positive',
+        details: 'Authored legislation to raise minimum wage to $15 per hour.',
+        politicians: ['Bernard Sanders'],
+        timestamp: Date.now() - 259200000
+      },
+      {
+        id: '4',
+        type: 'positive',
+        details: 'Strong advocate for clean energy and environmental protection legislation.',
+        politicians: ['Maria Cantwell', 'Sheldon Whitehouse'],
+        timestamp: Date.now() - 345600000
+      },
+      {
+        id: '5',
+        type: 'negative',
+        details: 'Supported legislation weakening antitrust enforcement against big tech companies.',
+        politicians: ['Amy Klobuchar'],
+        timestamp: Date.now() - 432000000
+      },
+      {
+        id: '6',
+        type: 'positive',
+        details: 'Led bipartisan efforts to lower prescription drug costs.',
+        politicians: ['Amy Klobuchar', 'Bernard Sanders'],
+        timestamp: Date.now()
+      },
+      {
+        id: '7',
+        type: 'positive',
+        details: 'Leading advocate for climate change action and corporate accountability.',
+        politicians: ['Sheldon Whitehouse'],
+        timestamp: Date.now() - 518400000
+      },
+      {
+        id: '8',
+        type: 'negative',
+        details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.',
+        politicians: ['John Fetterman', 'Catherine Cortez Masto', 'Richard J. Durbin', 'Maggie Hassan', 'Time Kaine', 'Angus King', 'Jacky Rosen', 'Jeanne Shaheen'],
+        timestamp: Date.now() - 518400000
+      },
+      {
+        id: '9',
+        type: 'negative',
+        details: 'Voted against all measures in recent years to block arms sales to the Israeli government while they were actively commiting genocide against Palestinians.',
+        politicians: ['Ron Wyden'],
+        timestamp: Date.now()
+      },
+      {
+        id: '10',
+        type: 'negative',
+        details: 'Endorsed by and funded by AIPAC, an organization that opposes efforts to hold the Israeli government accountable for acts of genocide committed against Palestinians.',
+        politicians: ['Ron Wyden'],
+        timestamp: Date.now()
       }
+    ];
+    
+    setRecords(initialRecords);
+    
+    try {
+      localStorage.setItem('records-data', JSON.stringify(initialRecords));
     } catch (err) {
       console.error('Error loading records:', err);
-      setRecords([]);
     }
   };
 
@@ -183,9 +200,10 @@ const App = () => {
     return age;
   };
 
-  const formatPoliticianInfo = (name, state, legInfo = null) => {
+  const formatPoliticianInfo = (name, legInfo = null) => {
     const info = legInfo || getLegislatorInfo(name);
     let role = '';
+    let displayName = name;
     
     if (info) {
       const type = info.type?.trim();
@@ -196,22 +214,59 @@ const App = () => {
       } else if (type === 'rep') {
         role = 'Representative';
       }
+
+      // Use nickname if available
+      if (info.nickname) {
+        displayName = `${info.nickname} ${info.last_name}`;
+      }
     }
 
     return {
-      name,
-      state,
+      name: displayName,
+      originalName: name,
+      state: info?.state?.trim() || '',
       role,
       party: info?.party?.trim() || '',
-      recommended: info?.recommended?.trim() || '',
       legInfo: info
     };
+  };
+
+  const getPoliticianRecommendation = (name, party) => {
+    // Republicans are automatically not recommended
+    if (party?.toLowerCase() === 'republican') {
+      return false;
+    }
+
+    // Check if politician has more positive or negative records
+    const politicianRecords = records.filter(c => 
+      c.politicians.some(p => p.toLowerCase() === name.toLowerCase())
+    );
+
+    const positiveCount = politicianRecords.filter(c => c.type === 'positive').length;
+    const negativeCount = politicianRecords.filter(c => c.type === 'negative').length;
+
+    if (positiveCount > negativeCount && positiveCount >= 2) return true;
+    if (negativeCount > positiveCount && negativeCount >= 2) return false;
+
+    return undefined;
+  };
+
+  const getPoliticianDescription = (name) => {
+    const nameLower = name.toLowerCase();
+    const descriptions = {
+      'bernard sanders': 'A democratic socialist and longtime progressive advocate who has consistently fought for working-class Americans, healthcare reform, and economic justice.',
+      'amy klobuchar': 'A moderate Democrat who often sides with corporate interests over progressive policies. Known for compromising on key progressive issues.',
+      'sheldon whitehouse': 'A strong progressive voice on climate change and corruption. Has been a tireless advocate for holding corporations accountable.'
+    };
+
+    return descriptions[nameLower] || null;
   };
 
   const handleSearch = async () => {
     setError('');
     setResults(null);
     setSelectedPolitician(null);
+    setSelectedRecord(null);
 
     if (!searchValue.trim()) {
       setError('Please enter a search value');
@@ -257,12 +312,12 @@ const App = () => {
       const reps = [];
       senators.forEach(sen => {
         const name = sen.full_name?.trim() || `${sen.first_name} ${sen.last_name}`;
-        reps.push(formatPoliticianInfo(name, state, sen));
+        reps.push(formatPoliticianInfo(name, sen));
       });
 
       if (representative) {
         const name = representative.full_name?.trim() || `${representative.first_name} ${representative.last_name}`;
-        reps.push(formatPoliticianInfo(name, state, representative));
+        reps.push(formatPoliticianInfo(name, representative));
       }
 
       setResults({
@@ -300,20 +355,12 @@ const App = () => {
 
       const allMatches = csvMatches.map(leg => {
         const name = leg.full_name?.trim() || `${leg.first_name} ${leg.last_name}`.trim();
-        
-        // Find records that match this legislator by name or bioguide_id
-        const politicianRecords = records.filter(r => {
-          const recordName = r.name.toLowerCase();
-          const csvName = name.toLowerCase();
-          if (recordName === csvName) return true;
-          
-          // Check using legislator lookup
-          const recordLeg = getLegislatorInfo(r.name);
-          return recordLeg && recordLeg.bioguide_id === leg.bioguide_id;
-        });
-        
+        const politicianRecords = records.filter(c => 
+          c.politicians.some(p => p.toLowerCase() === name.toLowerCase())
+        );
+
         return {
-          ...formatPoliticianInfo(name, leg.state?.trim(), leg),
+          ...formatPoliticianInfo(name, leg),
           recordCount: politicianRecords.length
         };
       });
@@ -329,94 +376,162 @@ const App = () => {
   };
 
   const viewPoliticianDetails = (politician) => {
-    // Normalize the name to find all matching records
-    const politicianRecords = records.filter(r => {
-      const recordName = r.name.toLowerCase();
-      const searchName = politician.name.toLowerCase();
-      
-      // Direct match
-      if (recordName === searchName) return true;
-      
-      // Check if they're the same person using legislator info
-      const recordLeg = getLegislatorInfo(r.name);
-      const searchLeg = politician.legInfo || getLegislatorInfo(politician.name);
-      
-      if (recordLeg && searchLeg) {
-        return recordLeg.bioguide_id === searchLeg.bioguide_id;
-      }
-      
-      return false;
-    });
+    const politicianRecords = records.filter(c =>
+      c.politicians.some(p => p.toLowerCase() === (politician.originalName || politician.name).toLowerCase())
+    );
     
-    const legInfo = politician.legInfo || getLegislatorInfo(politician.name);
+    const legInfo = politician.legInfo || getLegislatorInfo(politician.originalName || politician.name);
+
+    setPreviousView(selectedRecord ? 'record' : (results ? 'results' : 'home'));
     
     setSelectedPolitician({
       ...politician,
       records: politicianRecords,
       legInfo: legInfo,
-      age: legInfo ? calculateAge(legInfo.birthday) : null
+      age: legInfo ? calculateAge(legInfo.birthday) : null,
+      recommended: getPoliticianRecommendation(politician.originalName || politician.name, legInfo?.party),
+      description: getPoliticianDescription(politician.originalName || politician.name)
     });
+
+    setSelectedRecord(null);
+  };
+
+
+
+  const viewRecordDetails = (record, fromPolitician = false) => {
+    const recordPoliticians = record.politicians.map(name => {
+      const legInfo = getLegislatorInfo(name);
+      return formatPoliticianInfo(name, legInfo);
+    });
+
+    if (fromPolitician) {
+      setPreviousView('politician');
+    } else {
+      setPreviousView(null);
+    }
+
+    setSelectedRecord({
+      ...record,
+      politicianDetails: recordPoliticians
+    });
+    setSelectedPolitician(null);
+    setResults(null);
+  };
+
+  const goBack = () => {
+    if (previousView === 'politician' && selectedRecord) {
+      // Going back from record to politician - need to restore politician view
+      const politicianToRestore = selectedRecord.politicianDetails?.find(p => 
+        records.some(c => c.politicians.includes(p.originalName || p.name))
+      );
+      if (politicianToRestore) {
+        viewPoliticianDetails(politicianToRestore);
+        setPreviousView(null);
+      } else {
+        setSelectedRecord(null);
+        setPreviousView(null);
+      }
+    } else if (previousView === 'record' && selectedPolitician) {
+      // Going back from politician to record - need to restore record view
+      const recordToRestore = records.find(c => 
+        c.politicians.some(p => p.toLowerCase() === (selectedPolitician.originalName || selectedPolitician.name).toLowerCase())
+      );
+      if (recordToRestore) {
+        viewRecordDetails(recordToRestore, false);
+        setPreviousView(null);
+      } else {
+        setSelectedPolitician(null);
+        setPreviousView(null);
+      }
+    } else if (previousView === 'results' && selectedPolitician) {
+      // Going back from politician to search results
+      setSelectedPolitician(null);
+      setPreviousView(null);
+    } else {
+      // Default: go back to home
+      resetToHome();
+    }
+  };
+
+  const handleSubmitRecord = async (e) => {
+    e.preventDefault();
+    setSubmitStatus('sending');
+    
+    try {
+      // Read credentials
+      const credsData = await window.fs.readFile('credentials.txt', { encoding: 'utf8' });
+      const [email, password] = credsData.split('\n').map(line => line.trim());
+      
+      // In a real application, this would call a backend API endpoint
+      // that handles the actual email sending with nodemailer
+      // For demo purposes, we'll simulate it
+      
+      const emailBody = `
+New Record Submission for The Progressive Ballot
+
+Politicians:
+${submitPoliticians}
+
+Record Information:
+${submitRecord}
+`;
+      
+      // Simulated API call
+      console.log('Would send email to: garrett@garretthaines.info');
+      console.log('Subject: New record submission for The Political Ballot');
+      console.log('Body:', emailBody);
+      
+      // Simulate success
+      setSubmitStatus('success');
+      setSubmitPoliticians('');
+      setSubmitRecord('');
+      
+      setTimeout(() => setSubmitStatus(''), 3000);
+    } catch (err) {
+      console.error('Error submitting record:', err);
+      setSubmitStatus('error');
+      setTimeout(() => setSubmitStatus(''), 3000);
+    }
   };
 
   const resetToHome = () => {
     setSearchValue('');
     setResults(null);
     setSelectedPolitician(null);
+    setSelectedRecord(null);
+    setPreviousView(null);
     setError('');
+    setRecordSearchValue('');
+    setSubmitPoliticians('');
+    setSubmitRecord('');
+    setSubmitStatus('');
   };
 
-  const featuredPoliticians = records.reduce((acc, record) => {
-    const existing = acc.find(p => {
-      // Match by name
-      if (p.name.toLowerCase() === record.name.toLowerCase()) return true;
-      
-      // Match by bioguide_id if available
-      if (p.legInfo && p.legInfo.bioguide_id) {
-        const recordLeg = getLegislatorInfo(record.name);
-        return recordLeg && recordLeg.bioguide_id === p.legInfo.bioguide_id;
-      }
-      
-      return false;
-    });
-    
-    if (existing) {
-      existing.entries.push(record);
-    } else {
-      const legInfo = getLegislatorInfo(record.name);
-      const politicianInfo = formatPoliticianInfo(record.name, record.state, legInfo);
-      acc.push({
-        ...politicianInfo,
-        legInfo: legInfo,
-        entries: [record]
-      });
-    }
-    return acc;
-  }, []);
-
-  const featuredPositive = featuredPoliticians.filter(p => 
-    p.entries.some(e => e.type === 'positive')
-  ).slice(0, 3);
+  const recentRecords = [...records].sort((a, b) => b.timestamp - a.timestamp).slice(0, 5);
   
-  const featuredNegative = featuredPoliticians.filter(p => 
-    p.entries.some(e => e.type === 'negative')
-  ).slice(0, 3);
+  const filteredRecords = recordSearchValue.trim() 
+    ? records.filter(record => 
+        record.details.toLowerCase().includes(recordSearchValue.toLowerCase()) ||
+        record.politicians.some(p => p.toLowerCase().includes(recordSearchValue.toLowerCase()))
+      )
+    : recentRecords;
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 flex items-center justify-center">
         <div className="text-xl text-gray-700">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen p-4 md:p-6">
+      <div className="max-w-7xl md:max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center pt-4 mb-7 md:mb-10">
           <a 
             onClick={resetToHome}
-            className="font-neuton text-indigo-900 mb-3 cursor-pointer hover:opacity-80 transition-opacity tracking-tight"
+            className="font-neuton text-indigo-800 mb-3 cursor-pointer hover:opacity-80 transition-opacity tracking-tight"
           >
             <span
             className="text-4xl md:text-5xl"
@@ -424,16 +539,18 @@ const App = () => {
               The<br></br>
             </span>
             <h1 
-            className="-mt-3 md:-mt-5 text-5xl md:text-7xl inline-block pb-5 border-b-2 border-gray-300"
+            className="-mt-3 md:-mt-5 text-5xl md:text-7xl inline-block pb-4 border-b-2 border-gray-400"
             >
               Progressive Ballot
             </h1>
           </a>
-          <p className="text-gray-600 mt-4 text-sm md:text-xl">See who fights for progress — and who impedes it.</p>
+          <p className="text-gray-600 mt-3 text-sm md:text-xl">See who fights for progress — and who impedes it.</p>
         </div>
 
         {/* Search Section */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8 mb-8">
+                    <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Politicians</h3>
+            
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <button
               onClick={() => setSearchType('zip')}
@@ -494,7 +611,7 @@ const App = () => {
         </div>
 
         {/* Search Results */}
-        {results && !selectedPolitician && (
+        {results && !selectedPolitician && !selectedRecord && (
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8 mb-8">
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">
               {results.nameSearch ? 'Search Results' : `Your Representatives - ${results.state} District ${results.district}`}
@@ -534,20 +651,20 @@ const App = () => {
         {selectedPolitician && (
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8 mb-8">
             <button
-              onClick={() => setSelectedPolitician(null)}
+              onClick={goBack}
               className="mb-6 text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-2 transition-colors"
             >
-              ← Back to Results
+              ← Back
             </button>
             
             <div className="mb-8">
               <div className="flex items-start gap-3 mb-3">
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900">{selectedPolitician.name}</h2>
                 {selectedPolitician.recommended == "yes" && (
-                  <span className="text-3xl leading-none" title="Recommended">✅</span>
+                  <span className="text-3xl leading-none" title="Progressive">✅</span>
                 )}
                 {selectedPolitician.recommended == "no" && (
-                  <span className="text-3xl leading-none" title="Not Recommended">❌</span>
+                  <span className="text-3xl leading-none" title="Obstructionist">❌</span>
                 )}
               </div>
               <p className="text-xl text-gray-600 mb-4">
@@ -579,20 +696,7 @@ const App = () => {
                   {selectedPolitician.legInfo.address && (
                     <div className="flex items-center gap-3 sm:col-span-2">
                       <MapPinned className="text-indigo-600" size={20} />
-                      <span className="text-gray-700 text-sm">{selectedPolitician.legInfo.address}</span>
-                    </div>
-                  )}
-                  {selectedPolitician.legInfo.url && (
-                    <div className="flex items-center gap-3">
-                      <ExternalLink className="text-indigo-600" size={20} />
-                      <a 
-                        href={selectedPolitician.legInfo.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-indigo-600 hover:text-indigo-800 underline font-medium"
-                      >
-                        Official Website
-                      </a>
+                      <span className="text-gray-700 text-sm">{formatAddress(selectedPolitician.legInfo.address)}</span>
                     </div>
                   )}
                   {selectedPolitician.legInfo.contact_form && (
@@ -608,27 +712,67 @@ const App = () => {
                       </a>
                     </div>
                   )}
+                  {selectedPolitician.legInfo.url && (
+                    <div className="flex items-center gap-3">
+                      <ExternalLink className="text-indigo-600" size={20} />
+                      <a 
+                        href={selectedPolitician.legInfo.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800 underline font-medium"
+                      >
+                        Official Website
+                      </a>
+                    </div>
+                  )}
+                  {generateBioGuideUrl(selectedPolitician.legInfo) && (
+                    <div className="flex items-center gap-3">
+                      <ExternalLink className="text-indigo-600" size={20} />
+                      <a 
+                        href={generateBioGuideUrl(selectedPolitician.legInfo)} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800 underline font-medium"
+                      >
+                        Congressional Biography
+                      </a>
+                    </div>
+                  )}
+                  {generateOpenSecretsUrl(selectedPolitician.legInfo) && (
+                    <div className="flex items-center gap-3">
+                      <ExternalLink className="text-indigo-600" size={20} />
+                      <a 
+                        href={generateOpenSecretsUrl(selectedPolitician.legInfo)} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-indigo-600 hover:text-indigo-800 underline font-medium"
+                      >
+                        OpenSecrets Profile
+                      </a>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
-            <h3 className="text-2xl font-bold text-gray-900 mb-6">Records</h3>
+             <h3 className="text-2xl font-bold text-gray-900 mb-6">Records</h3>
             {selectedPolitician.records && selectedPolitician.records.length > 0 ? (
               <div className="space-y-4">
                 {selectedPolitician.records.map((record, idx) => (
                   <div
                     key={idx}
-                    className={`p-5 rounded-xl border-l-4 ${
+                    onClick={() => viewRecordDetails(record, true)}
+                    className={`p-5 rounded-xl border-l-4 cursor-pointer hover:shadow-md transition-all ${
                       record.type === 'positive'
-                        ? 'bg-green-50 border-green-500'
-                        : 'bg-red-50 border-red-500'
+                        ? 'bg-goodGreen-50 border-goodGreen-500 hover:bg-goodGreen-100'
+                        : 'bg-badOrange-50 border-badOrange-500 hover:bg-badOrange-100'
                     }`}
                   >
                     <div className="flex items-start gap-4">
                       {record.type === 'positive' ? (
-                        <ThumbsUp className="text-green-600 mt-1 flex-shrink-0" size={24} />
+                        <ThumbsUp className="text-goodGreen-600 mt-1 flex-shrink-0" size={24} />
                       ) : (
-                        <ThumbsDown className="text-red-600 mt-1 flex-shrink-0" size={24} />
+                        <ThumbsDown className="text-badOrange-600 mt-1 flex-shrink-0" size={24} />
                       )}
                       <p className="text-gray-800 flex-1 leading-relaxed">{record.details}</p>
                     </div>
@@ -641,75 +785,96 @@ const App = () => {
           </div>
         )}
 
-        {/* Featured Politicians */}
-        {!results && !selectedPolitician && (
-          <div className="grid lg:grid-cols-2 gap-6">
-            {/* Positive Featured */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-green-800 mb-6 flex items-center gap-3">
-                <ThumbsUp size={32} />
-                Progressives
-              </h3>
-              <div className="space-y-4">
-                {featuredPositive.map((pol, idx) => (
-                  <div
-                    key={idx}
-                    onClick={() => viewPoliticianDetails(pol)}
-                    className="p-5 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 hover:border-green-300 hover:shadow-md cursor-pointer transition-all"
-                  >
-                    <div className="flex items-start gap-2 mb-2">
-                      <h4 className="font-bold text-lg text-gray-900 flex-1">{pol.name}</h4>
-                      {pol.recommended == "yes" && (
-                        <span className="text-2xl leading-none" title="Recommended">✅</span>
-                      )}
-                      {pol.recommended == "no" && (
-                        <span className="text-2xl leading-none" title="Not Recommended">❌</span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      {pol.role && `${pol.role} - `}{pol.state}
-                      {pol.party && ` (${pol.party})`}
-                    </p>
-                    <p className="text-gray-700 text-sm font-medium">
-                      {pol.entries.filter(e => e.type === 'positive').length} positive {pol.entries.filter(e => e.type === 'positive').length === 1 ? 'entry' : 'entries'}
-                    </p>
-                  </div>
-                ))}
+        {/* Record Details */}
+        {selectedRecord && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8 mb-8">
+            <button
+              onClick={goBack}
+              className="mb-6 text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-2 transition-colors"
+            >
+              ← Back
+            </button>
+            
+            <div className={`p-5 rounded-xl border-l-4 mb-8 ${
+              selectedRecord.type === 'positive'
+                ? 'bg-goodGreen-50 border-goodGreen-500'
+                : 'bg-badOrange-50 border-badOrange-500'
+            }`}>
+              <div className="flex items-start gap-4">
+                {selectedRecord.type === 'positive' ? (
+                  <ThumbsUp className="text-goodGreen-600 mt-1 flex-shrink-0" size={32} />
+                ) : (
+                  <ThumbsDown className="text-badOrange-600 mt-1 flex-shrink-0" size={32} />
+                )}
+                <p className="text-gray-900 flex-1 leading-relaxed text-lg font-medium">{selectedRecord.details}</p>
               </div>
             </div>
 
-            {/* Negative Featured */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8">
-              <h3 className="text-2xl md:text-3xl font-bold text-red-800 mb-6 flex items-center gap-3">
-                <span className="mt-1"><ThumbsDown size={32} /></span>
-                Obstructionists
-              </h3>
-              <div className="space-y-4">
-                {featuredNegative.map((pol, idx) => (
+           {/* <h3 className="text-2xl font-bold text-gray-900 mb-6">Politicians Associated with This Record</h3> */}
+            <div className="space-y-3">
+              {selectedRecord.politicianDetails.map((pol, idx) => (
+                <div
+                  key={idx}
+                  onClick={() => viewPoliticianDetails(pol)}
+                  className="p-5 border border-gray-200 rounded-xl hover:border-indigo-300 hover:shadow-md cursor-pointer transition-all bg-white"
+                >
+                  <h4 className="font-bold text-lg text-gray-900">{pol.name}</h4>
+                  <p className="text-gray-600 text-sm mt-1">
+                    {pol.role && `${pol.role} - `}
+                    {pol.state}
+                    {pol.party && ` (${pol.party})`}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Recent Records */}
+        {!results && !selectedPolitician && !selectedRecord && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8">
+            <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Legislation</h3>
+            
+            <div className="mb-6">
+              <input
+                type="text"
+                value={recordSearchValue}
+                onChange={(e) => setRecordSearchValue(e.target.value)}
+                placeholder="Search records by keyword or politician name..."
+                className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
+              />
+            </div>
+            
+            <div className="space-y-4">
+              {filteredRecords.length > 0 ? (
+                filteredRecords.map((record, idx) => (
                   <div
                     key={idx}
-                    onClick={() => viewPoliticianDetails(pol)}
-                    className="p-5 bg-gradient-to-br from-red-50 to-rose-50 rounded-xl border border-red-200 hover:border-red-300 hover:shadow-md cursor-pointer transition-all"
+                    onClick={() => viewRecordDetails(record)}
+                    className={`p-5 rounded-xl border-l-4 cursor-pointer hover:shadow-md transition-all ${
+                      record.type === 'positive'
+                        ? 'bg-goodGreen-50 border-goodGreen-500 hover:bg-goodGreen-100'
+                        : 'bg-badOrange-50 border-badOrange-500 hover:bg-badOrange-100'
+                    }`}
                   >
-                    <div className="flex items-start gap-2 mb-2">
-                      <h4 className="font-bold text-lg text-gray-900 flex-1">{pol.name}</h4>
-                      {pol.recommended == "yes" && (
-                        <span className="text-2xl leading-none" title="Recommended">✅</span>
+                    <div className="flex items-start gap-4">
+                      {record.type === 'positive' ? (
+                        <ThumbsUp className="text-goodGreen-600 mt-1 flex-shrink-0" size={24} />
+                      ) : (
+                        <ThumbsDown className="text-badOrange-600 mt-1 flex-shrink-0" size={24} />
                       )}
-                      {pol.recommended == "no" && (
-                        <span className="text-2xl leading-none" title="Not Recommended">❌</span>
-                      )}
+                      <div className="flex-1">
+                        <p className="text-gray-800 leading-relaxed mb-2">{record.details}</p>
+                        <p className="text-sm text-gray-600">
+                          {record.politicians.length} {record.politicians.length === 1 ? 'politician' : 'politicians'}
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">
-                      {pol.role && `${pol.role} - `}{pol.state}
-                      {pol.party && ` (${pol.party})`}
-                    </p>
-                    <p className="text-gray-700 text-sm font-medium">
-                      {pol.entries.filter(e => e.type === 'negative').length} negative {pol.entries.filter(e => e.type === 'negative').length === 1 ? 'entry' : 'entries'}
-                    </p>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <p className="text-gray-600 text-center py-8">No records found matching your search.</p>
+              )}
             </div>
           </div>
         )}
