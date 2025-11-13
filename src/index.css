@@ -11,13 +11,14 @@
 
 
 body {
-  background: linear-gradient(to bottom right, #fce3f1, #f0e0ff, #e0eeff);
+  background: linear-gradient(to bottom left, #e0eeff, #f0e0ff, #fce3f1);
   background-attachment: fixed;
 }
 
+/*
 @media (max-width: 640px) {
   body {
     background: linear-gradient(to bottom right, #e0eeff, #f0e0ff, #fce3f1);
   }
 }
-
+*/
