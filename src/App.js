@@ -88,88 +88,17 @@ const App = () => {
     }
   };
 
-
-
   const loadRecords = async () => {
-    const initialRecords = [
-      {
-        id: '1',
-        type: 'negative',
-        details: 'Voted to increase ACA healthcare premiums for millions of Americans.',
-        politicians: ['John Fetterman'],
-        timestamp: Date.now() - 86400000
-      },
-      {
-        id: '2',
-        type: 'positive',
-        details: 'Consistently fought for Medicare for All and expanded healthcare access.',
-        politicians: ['Bernard Sanders'],
-        timestamp: Date.now() - 172800000
-      },
-      {
-        id: '3',
-        type: 'positive',
-        details: 'Authored legislation to raise minimum wage to $15 per hour.',
-        politicians: ['Bernard Sanders'],
-        timestamp: Date.now() - 259200000
-      },
-      {
-        id: '4',
-        type: 'positive',
-        details: 'Strong advocate for clean energy and environmental protection legislation.',
-        politicians: ['Maria Cantwell', 'Sheldon Whitehouse'],
-        timestamp: Date.now() - 345600000
-      },
-      {
-        id: '5',
-        type: 'negative',
-        details: 'Supported legislation weakening antitrust enforcement against big tech companies.',
-        politicians: ['Amy Klobuchar'],
-        timestamp: Date.now() - 432000000
-      },
-      {
-        id: '6',
-        type: 'positive',
-        details: 'Led bipartisan efforts to lower prescription drug costs.',
-        politicians: ['Amy Klobuchar', 'Bernard Sanders'],
-        timestamp: Date.now()
-      },
-      {
-        id: '7',
-        type: 'positive',
-        details: 'Leading advocate for climate change action and corporate accountability.',
-        politicians: ['Sheldon Whitehouse'],
-        timestamp: Date.now() - 518400000
-      },
-      {
-        id: '8',
-        type: 'negative',
-        details: 'Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.',
-        politicians: ['John Fetterman', 'Catherine Cortez Masto', 'Richard J. Durbin', 'Maggie Hassan', 'Time Kaine', 'Angus King', 'Jacky Rosen', 'Jeanne Shaheen'],
-        timestamp: Date.now() - 518400000
-      },
-      {
-        id: '9',
-        type: 'negative',
-        details: 'Voted against all measures in recent years to block arms sales to the Israeli government while they were actively commiting genocide against Palestinians.',
-        politicians: ['Ron Wyden'],
-        timestamp: Date.now()
-      },
-      {
-        id: '10',
-        type: 'negative',
-        details: 'Endorsed by and funded by AIPAC, an organization that opposes efforts to hold the Israeli government accountable for acts of genocide committed against Palestinians.',
-        politicians: ['Ron Wyden'],
-        timestamp: Date.now()
-      }
-    ];
-    
-    setRecords(initialRecords);
-    
     try {
+      const response = await fetch('/records.json');
+      if (!response.ok) {
+        throw new Error('Failed to load records');
+      }
+      const initialRecords = await response.json();
+      setRecords(initialRecords);
       localStorage.setItem('records-data', JSON.stringify(initialRecords));
-    } catch (err) {
-      console.error('Error loading records:', err);
+    } catch (error) {
+      console.error('Error loading records:', error);
     }
   };
 
@@ -708,7 +637,7 @@ ${submitRecord}
                         href={selectedPolitician.legInfo.contact_form} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-indigo-600 hover:text-indigo-800 underline font-medium"
+                        className="text-indigo-600 hover:text-indigo-800 underline text-sm"
                       >
                         Contact Form
                       </a>
@@ -721,7 +650,7 @@ ${submitRecord}
                         href={selectedPolitician.legInfo.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-indigo-600 hover:text-indigo-800 underline font-medium"
+                        className="text-indigo-600 hover:text-indigo-800 underline text-sm"
                       >
                         Official Website
                       </a>
@@ -734,7 +663,7 @@ ${submitRecord}
                         href={generateBioGuideUrl(selectedPolitician.legInfo)} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-indigo-600 hover:text-indigo-800 underline font-medium"
+                        className="text-indigo-600 hover:text-indigo-800 underline text-sm"
                       >
                         Congressional Biography
                       </a>
@@ -747,7 +676,7 @@ ${submitRecord}
                         href={generateOpenSecretsUrl(selectedPolitician.legInfo)} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-indigo-600 hover:text-indigo-800 underline font-medium"
+                        className="text-indigo-600 hover:text-indigo-800 underline text-sm"
                       >
                         OpenSecrets Profile
                       </a>
