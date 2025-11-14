@@ -1,0 +1,72 @@
+[
+  {
+    "id": "1",
+    "type": "negative",
+    "details": "Voted to increase ACA healthcare premiums for millions of Americans.",
+    "politicians": ["John Fetterman"],
+    "timestamp": 1731355200000
+  },
+  {
+    "id": "2",
+    "type": "positive",
+    "details": "Consistently fought for Medicare for All and expanded healthcare access.",
+    "politicians": ["Bernard Sanders"],
+    "timestamp": 1731268800000
+  },
+  {
+    "id": "3",
+    "type": "positive",
+    "details": "Authored legislation to raise minimum wage to $15 per hour.",
+    "politicians": ["Bernard Sanders"],
+    "timestamp": 259200000
+  },
+  {
+    "id": "4",
+    "type": "positive",
+    "details": "Strong advocate for clean energy and environmental protection legislation.",
+    "politicians": ["Maria Cantwell", "Sheldon Whitehouse"],
+    "timestamp": 345600000
+  },
+  {
+    "id": "5",
+    "type": "negative",
+    "details": "Supported legislation weakening antitrust enforcement against big tech companies.",
+    "politicians": ["Amy Klobuchar"],
+    "timestamp": 432000000
+  },
+  {
+    "id": "6",
+    "type": "positive",
+    "details": "Led bipartisan efforts to lower prescription drug costs.",
+    "politicians": ["Amy Klobuchar", "Bernard Sanders"],
+    "timestamp": 1731268800000
+  },
+  {
+    "id": "7",
+    "type": "positive",
+    "details": "Leading advocate for climate change action and corporate accountability.",
+    "politicians": ["Sheldon Whitehouse"],
+    "timestamp": 518400000
+  },
+  {
+    "id": "8",
+    "type": "negative",
+    "details": "Supported a funding deal without ACA subsidy protections, causing significant healthcare premium increases for millions of Americans.",
+    "politicians": ["John Fetterman", "Catherine Cortez Masto", "Richard J. Durbin", "Maggie Hassan", "Time Kaine", "Angus King", "Jacky Rosen", "Jeanne Shaheen"],
+    "timestamp": 518400000
+  },
+  {
+    "id": "9",
+    "type": "negative",
+    "details": "Voted against all measures in recent years to block arms sales to the Israeli government while they were actively commiting genocide against Palestinians.",
+    "politicians": ["Ron Wyden"],
+    "timestamp": 1731268800000
+  },
+  {
+    "id": "10",
+    "type": "negative",
+    "details": "Endorsed by and funded by AIPAC, an organization that opposes efforts to hold the Israeli government accountable for acts of genocide committed against Palestinians.",
+    "politicians": ["Ron Wyden"],
+    "timestamp": 1731268800000
+  }
+]
