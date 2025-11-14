@@ -548,67 +548,69 @@ ${submitRecord}
         </div>
 
         {/* Search Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8 mb-8">
-                    <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Politicians</h3>
-            
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <button
-              onClick={() => setSearchType('zip')}
-              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
-                searchType === 'zip'
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <MapPin className="inline mr-2" size={20} />
-              Search by ZIP Code
-            </button>
-            <button
-              onClick={() => setSearchType('name')}
-              className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
-                searchType === 'name'
-                  ? 'bg-indigo-600 text-white shadow-md'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <User className="inline mr-2" size={20} />
-              Search by Name
-            </button>
-          </div>
+        {!selectedRecord && !selectedPolitician && (
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-md border border-gray-100 p-6 md:p-8 mb-8">
+                      <h3 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">Politicians</h3>
+              
+            <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <button
+                onClick={() => setSearchType('zip')}
+                className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
+                  searchType === 'zip'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <MapPin className="inline mr-2" size={20} />
+                Search by ZIP Code
+              </button>
+              <button
+                onClick={() => setSearchType('name')}
+                className={`flex-1 py-3 px-6 rounded-xl font-semibold transition-all ${
+                  searchType === 'name'
+                    ? 'bg-indigo-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                <User className="inline mr-2" size={20} />
+                Search by Name
+              </button>
+            </div>
 
-          <div className="flex gap-3">
-            <input
-              type="text"
-              value={searchValue}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (searchType === 'zip') {
-                  if (/^\d{0,5}$/.test(val)) {
+            <div className="flex gap-3 w-full">
+              <input
+                type="text"
+                value={searchValue}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  if (searchType === 'zip') {
+                    if (/^\d{0,5}$/.test(val)) {
+                      setSearchValue(val);
+                    }
+                  } else {
                     setSearchValue(val);
                   }
-                } else {
-                  setSearchValue(val);
-                }
-              }}
-              placeholder={searchType === 'zip' ? 'Enter 5-digit ZIP code' : 'Enter politician name'}
-              className="flex-1 px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            />
-            <button
-              onClick={handleSearch}
-              className="bg-indigo-600 text-white px-6 md:px-8 py-4 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-md"
-            >
-              <Search className="inline mr-2" size={20} />
-              <span className="hidden sm:inline">Search</span>
-            </button>
-          </div>
-
-          {error && (
-            <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-100">
-              {error}
+                }}
+                placeholder={searchType === 'zip' ? 'Enter 5-digit ZIP code...' : 'Enter politician name...'}
+                className="flex-1 min-w-0 px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              />
+              <button
+                onClick={handleSearch}
+                className="bg-indigo-600 text-white px-6 md:px-8 py-4 rounded-xl font-semibold hover:bg-indigo-700 transition-all shadow-md flex-shrink-0"
+              >
+                <Search className="inline md:mr-2 -mt-1" size={20} />
+                <span className="hidden sm:inline">Search</span>
+              </button>
             </div>
-          )}
-        </div>
+
+            {error && (
+              <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-xl border border-red-100">
+                {error}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Search Results */}
         {results && !selectedPolitician && !selectedRecord && (
@@ -840,7 +842,7 @@ ${submitRecord}
                 type="text"
                 value={recordSearchValue}
                 onChange={(e) => setRecordSearchValue(e.target.value)}
-                placeholder="Search records by keyword or politician name..."
+                placeholder="Search by keyword or politician name..."
                 className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all"
               />
             </div>
